@@ -85,6 +85,12 @@ class ProductResource extends Resource
                                     ->numeric()
                                     ->helperText('Jumlah produk yang tersedia')
                                     ->required(),
+                                Select::make('unit_id')
+                                    ->helperText('Satuan produk yang akan dijual')
+                                    ->relationship('unit', 'name')
+                                    ->preload()
+                                    ->searchable()
+                                    ->required()
                             ])->columns(2),
                     ])->columnSpan(8),
                 Grid::make()
@@ -106,6 +112,7 @@ class ProductResource extends Resource
                                     ->multiple()
                                     ->relationship('categories', 'name')
                                     ->preload()
+                                    ->searchable()
                                     ->required()
                             ]),
                     ])->columnSpan(4),
@@ -131,7 +138,11 @@ class ProductResource extends Resource
                     ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
                 Tables\Columns\TextColumn::make('sell_price')
                     ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
-                Tables\Columns\TextColumn::make('stock'),
+                Tables\Columns\TextColumn::make('stock')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('unit.name')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->date('d M Y - H:i')
                     ->sortable()
