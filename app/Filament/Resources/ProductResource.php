@@ -47,27 +47,45 @@ class ProductResource extends Resource
     {
         return $form
             ->schema([
-                Section::make('Product')
+                Grid::make()
                     ->schema([
-                        Grid::make()
+                        Section::make('Product')
                             ->schema([
-                                Forms\Components\TextInput::make('name')
-                                    ->reactive()
-                                    ->afterStateUpdated(function (Closure $set, $state) {
-                                        $set('slug', Str::slug($state));
-                                    })
+                                Grid::make()
+                                    ->schema([
+                                        Forms\Components\TextInput::make('name')
+                                            ->reactive()
+                                            ->afterStateUpdated(function (Closure $set, $state) {
+                                                $set('slug', Str::slug($state));
+                                            })
+                                            ->required()
+                                            ->string()
+                                            ->maxLength(255),
+                                        Forms\Components\TextInput::make('slug')
+                                            ->required()
+                                            ->unique(table: Product::class, ignoreRecord: true)
+                                            ->maxLength(2048),
+                                    ]),
+                                Forms\Components\MarkdownEditor::make('description')
                                     ->required()
                                     ->string()
-                                    ->maxLength(255),
-                                Forms\Components\TextInput::make('slug')
-                                    ->required()
-                                    ->unique(table: Product::class, ignoreRecord: true)
-                                    ->maxLength(2048),
+                                    ->maxLength(65535),
                             ]),
-                        Forms\Components\MarkdownEditor::make('description')
-                            ->required()
-                            ->string()
-                            ->maxLength(65535),
+                        Section::make('Pricing')
+                            ->schema([
+                                Forms\Components\TextInput::make('buy_price')
+                                    ->numeric()
+                                    ->mask(fn (TextInput\Mask $mask) => $mask->money(prefix: 'Rp ', thousandsSeparator: ',', decimalPlaces: 2, isSigned: false))
+                                    ->required(),
+                                Forms\Components\TextInput::make('sell_price')
+                                    ->numeric()
+                                    ->mask(fn (TextInput\Mask $mask) => $mask->money(prefix: 'Rp ', thousandsSeparator: ',', decimalPlaces: 2, isSigned: false))
+                                    ->required(),
+                                Forms\Components\TextInput::make('stock')
+                                    ->numeric()
+                                    ->helperText('Jumlah produk yang tersedia')
+                                    ->required(),
+                            ])->columns(2),
                     ])->columnSpan(8),
                 Grid::make()
                     ->schema([
@@ -91,19 +109,6 @@ class ProductResource extends Resource
                                     ->required()
                             ]),
                     ])->columnSpan(4),
-                Section::make('Pricing')
-                    ->schema([
-                        Forms\Components\TextInput::make('buy_price')
-                            ->mask(fn (TextInput\Mask $mask) => $mask->money(prefix: 'Rp ', thousandsSeparator: '.', decimalPlaces: 2, isSigned: false))
-                            ->required(),
-                        Forms\Components\TextInput::make('sell_price')
-                            ->mask(fn (TextInput\Mask $mask) => $mask->money(prefix: 'Rp ', thousandsSeparator: '.', decimalPlaces: 2, isSigned: false))
-                            ->required(),
-                        Forms\Components\TextInput::make('stock')
-                            ->numeric()
-                            ->helperText('Jumlah produk yang tersedia')
-                            ->required(),
-                    ])->columns(2)->columnSpan(8),
             ])->columns(12);
     }
 
@@ -111,24 +116,41 @@ class ProductResource extends Resource
     {
         return $table
             ->columns([
-                Tables\Columns\TextColumn::make('name'),
-                Tables\Columns\TextColumn::make('slug'),
-                Tables\Columns\TextColumn::make('image'),
-                Tables\Columns\TextColumn::make('description'),
-                Tables\Columns\TextColumn::make('buy_price'),
-                Tables\Columns\TextColumn::make('sell_price'),
+                Tables\Columns\ImageColumn::make('image')
+                    ->size(80)
+                    ->square()
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('name')
+                    ->wrap()
+                    ->sortable()
+                    ->searchable(['name', 'description']),
+                Tables\Columns\TagsColumn::make('categories.name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('buy_price')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                Tables\Columns\TextColumn::make('sell_price')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
                 Tables\Columns\TextColumn::make('stock'),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                    ->date('d M Y - H:i')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-            ])
+                    ->date('d M Y - H:i')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])->defaultSort('updated_at', 'desc')
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('categories')
+                    ->multiple()
+                    ->relationship('categories', 'name')
             ])
             ->actions([
-                Tables\Actions\ViewAction::make(),
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),
@@ -147,7 +169,6 @@ class ProductResource extends Resource
         return [
             'index' => Pages\ListProducts::route('/'),
             'create' => Pages\CreateProduct::route('/create'),
-            'view' => Pages\ViewProduct::route('/{record}'),
             'edit' => Pages\EditProduct::route('/{record}/edit'),
         ];
     }
