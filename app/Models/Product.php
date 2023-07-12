@@ -19,7 +19,8 @@ class Product extends Model
         'buy_price',
         'sell_price',
         'stock',
-        'unit_id'
+        'unit_id',
+        'barcode'
     ];
 
     public function getRouteKeyName(): string

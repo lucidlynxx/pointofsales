@@ -127,7 +127,10 @@ class ProductResource extends Resource
                     ->size(80)
                     ->square()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\ViewColumn::make('barcode')
+                    ->view('products.table.barcode'),
                 Tables\Columns\TextColumn::make('name')
+                    ->formatStateUsing(fn (string $state): string => __(ucwords($state)))
                     ->wrap()
                     ->sortable()
                     ->searchable(['name', 'description']),
