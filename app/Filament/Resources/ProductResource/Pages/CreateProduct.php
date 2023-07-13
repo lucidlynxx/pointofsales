@@ -13,7 +13,7 @@ class CreateProduct extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $data['barcode'] = Str::padLeft(random_int(0, 9999999999), 10, '0');
+        $data['barcode'] = random_int(1000000000, 9999999999);
 
         return static::getModel()::create($data);
     }

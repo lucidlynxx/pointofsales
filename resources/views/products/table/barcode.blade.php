@@ -1,3 +1,4 @@
-<div class="pl-4">
-    {!! DNS1D::getBarcodeHTML($getState(), 'UPCA', 2, 25, 'black') !!}
+<div class="py-2 pl-4 text-center">
+    {!! DNS1D::getBarcodeHTML($getState(), 'EAN13', 2, 25, 'black') !!}
+    {{ $getState() }}
 </div>

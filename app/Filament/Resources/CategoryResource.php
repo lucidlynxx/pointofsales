@@ -55,7 +55,8 @@ class CategoryResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->date('d M Y - H:i')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->date('d M Y - H:i')
                     ->sortable()

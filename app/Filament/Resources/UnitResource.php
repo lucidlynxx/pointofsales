@@ -21,7 +21,7 @@ class UnitResource extends Resource
 {
     protected static ?string $model = Unit::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-view-boards';
+    protected static ?string $navigationIcon = 'heroicon-o-collection';
 
     protected static ?string $navigationGroup = 'Shop';
 
@@ -54,7 +54,8 @@ class UnitResource extends Resource
                 Tables\Columns\TextColumn::make('created_at')
                     ->date('d M Y - H:i')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->date('d M Y - H:i')
                     ->sortable()
