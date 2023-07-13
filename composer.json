@@ -16,6 +16,7 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^2.12",
         "milon/barcode": "^10.0",
+        "ryangjchandler/filament-profile": "^0.3.0",
         "spatie/laravel-permission": "^5.10"
     },
     "require-dev": {

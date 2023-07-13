@@ -24,7 +24,7 @@ class AppServiceProvider extends ServiceProvider
             Filament::registerViteTheme('resources/css/filament.css');
             Filament::registerNavigationGroups([
                 'Shop',
-                // 'Transaction',
+                'Role and Permission',
                 'Account',
             ]);
         });

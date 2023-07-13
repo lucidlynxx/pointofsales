@@ -1,0 +1,22 @@
+<?php
+
+namespace App\Filament\Resources\PermissionResource\Pages;
+
+use App\Filament\Resources\PermissionResource;
+use Filament\Pages\Actions;
+use Filament\Pages\Actions\CreateAction;
+use Filament\Resources\Pages\ManageRecords;
+
+class ManagePermissions extends ManageRecords
+{
+    protected static string $resource = PermissionResource::class;
+
+    protected function getActions(): array
+    {
+        return [
+            Actions\CreateAction::make(),
+            CreateAction::make()
+                ->successNotificationTitle('Permission created'),
+        ];
+    }
+}
