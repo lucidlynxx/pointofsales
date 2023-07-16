@@ -37,11 +37,11 @@ class SaleResource extends Resource
                         Forms\Components\Section::make('Sale details')
                             ->schema([
                                 Forms\Components\TextInput::make('invoice')
-                                    ->default('INV-' . strtoupper(Str::random(6)))
+                                    ->default('INV-' . strtoupper(Str::random(10)))
                                     ->disabled()
                                     ->required(),
                                 Forms\Components\TextInput::make('name')
-                                    ->default(auth()->user()->name)
+                                    ->placeholder(auth()->user()->name)
                                     ->disabled()
                                     ->dehydrated(false)
                             ])->columns(2),
@@ -53,10 +53,14 @@ class SaleResource extends Resource
                                         Forms\Components\Select::make('product_id')
                                             ->label('Product')
                                             ->reactive()
-                                            ->afterStateUpdated(function ($state, callable $set) {
+                                            ->afterStateUpdated(function ($state, callable $set, Closure $get) {
                                                 $product = Product::find($state);
                                                 if ($product) {
-                                                    $set('price', number_format($product->sell_price, 0, '.', ','));
+                                                    $set('price', $product->sell_price);
+                                                    $prices = $get('../../saleItems');
+                                                    $values = collect($prices)->pluck('price');
+
+                                                    $set('../../total', $values->sum());
                                                 }
                                             })
                                             ->searchable()
@@ -75,7 +79,11 @@ class SaleResource extends Resource
                                             ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
                                                 $product = Product::find($get('product_id'));
                                                 if ($product) {
-                                                    $set('price', number_format($state * $product->sell_price, 0, '.', ','));
+                                                    $set('price', $state * $product->sell_price);
+                                                    $prices = $get('../../saleItems');
+                                                    $values = collect($prices)->pluck('price');
+
+                                                    $set('../../total', $values->sum());
                                                 }
                                             })
                                             ->numeric()
@@ -97,14 +105,7 @@ class SaleResource extends Resource
                         Forms\Components\Section::make('Payment')
                             ->schema([
                                 Forms\Components\TextInput::make('total')
-                                    ->placeholder(function (Closure $get) {
-                                        $prices = $get('saleItems');
-                                        $values = collect($prices)->pluck('price')->map(function ($prices) {
-                                            return (float)str_replace(',', '.', $prices);
-                                        });
-
-                                        return number_format($values->sum() * 1000, 0);
-                                    })
+                                    ->reactive()
                                     ->disabled()
                                     ->required(),
                                 Forms\Components\TextInput::make('discount')
@@ -113,14 +114,12 @@ class SaleResource extends Resource
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
-                                    ->lazy()
+                                    ->debounce('800ms')
                                     ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
                                         $prices = $get('saleItems');
-                                        $values = collect($prices)->pluck('price')->map(function ($prices) {
-                                            return (float)str_replace(',', '.', $prices);
-                                        });
+                                        $values = collect($prices)->pluck('price');
 
-                                        $set('total', number_format(($values->sum() * 1000) - $state, 0));
+                                        $set('total', $values->sum() - $state);
                                     })
                                     ->numeric(),
                                 Forms\Components\TextInput::make('payment')
@@ -129,14 +128,9 @@ class SaleResource extends Resource
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
-                                    ->lazy()
-                                    ->afterStateUpdated(function (Closure $set, Closure $get) {
-                                        $prices = $get('saleItems');
-                                        $values = collect($prices)->pluck('price')->map(function ($prices) {
-                                            return (float)str_replace(',', '.', $prices);
-                                        });
-
-                                        $set('total', $values->sum() * 1000);
+                                    ->debounce('800ms')
+                                    ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
+                                        $set('change', str_replace('-', '', strval($get('total') - $state)));
                                     })
                                     ->gte('total')
                                     ->numeric()
@@ -153,22 +147,40 @@ class SaleResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('created_at')
+                    ->date('d M Y - H:i:s')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('user.name'),
                 Tables\Columns\TextColumn::make('invoice'),
-                Tables\Columns\TextColumn::make('total'),
-                Tables\Columns\TextColumn::make('discount'),
-                Tables\Columns\TextColumn::make('payment'),
-                Tables\Columns\TextColumn::make('change'),
-                Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime(),
+                Tables\Columns\TextColumn::make('total')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                Tables\Columns\TextColumn::make('discount')
+                    ->formatStateUsing(function ($state) {
+                        if ($state === null) {
+                            return "Rp 0";
+                        }
+                        return "Rp " . number_format($state, 0, '.', ',');
+                    })
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('payment')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ','))
+                    ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('change')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ','))
+                    ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime(),
-            ])
+                    ->date('d M Y - H:i')
+                    ->sortable()
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: true),
+            ])->defaultSort('updated_at', 'desc')
             ->filters([
                 //
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\DeleteBulkAction::make(),

@@ -20,10 +20,16 @@ class CreateSale extends CreateRecord
 
     protected function handleRecordCreation(array $data): Model
     {
-        $data['total'] = str_replace(',', '', $data['total']);
-
-        dd($data);
-
         return static::getModel()::create($data);
+    }
+
+    protected function getRedirectUrl(): string
+    {
+        return $this->getResource()::getUrl('index');
+    }
+
+    protected function getCreatedNotificationTitle(): ?string
+    {
+        return 'Sale created';
     }
 }
