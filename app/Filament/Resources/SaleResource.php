@@ -37,7 +37,7 @@ class SaleResource extends Resource
                         Forms\Components\Section::make('Sale details')
                             ->schema([
                                 Forms\Components\TextInput::make('invoice')
-                                    ->default('INV-' . strtoupper(Str::random(10)))
+                                    ->default('INV-' . strtoupper(Str::random(6)))
                                     ->disabled()
                                     ->required(),
                                 Forms\Components\TextInput::make('name')
@@ -113,6 +113,15 @@ class SaleResource extends Resource
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
+                                    ->lazy()
+                                    ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
+                                        $prices = $get('saleItems');
+                                        $values = collect($prices)->pluck('price')->map(function ($prices) {
+                                            return (float)str_replace(',', '.', $prices);
+                                        });
+
+                                        $set('total', number_format(($values->sum() * 1000) - $state, 0));
+                                    })
                                     ->numeric(),
                                 Forms\Components\TextInput::make('payment')
                                     ->mask(
@@ -120,6 +129,16 @@ class SaleResource extends Resource
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
+                                    ->lazy()
+                                    ->afterStateUpdated(function (Closure $set, Closure $get) {
+                                        $prices = $get('saleItems');
+                                        $values = collect($prices)->pluck('price')->map(function ($prices) {
+                                            return (float)str_replace(',', '.', $prices);
+                                        });
+
+                                        $set('total', $values->sum() * 1000);
+                                    })
+                                    ->gte('total')
                                     ->numeric()
                                     ->required(),
                                 Forms\Components\TextInput::make('change')

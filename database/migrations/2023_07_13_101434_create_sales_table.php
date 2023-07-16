@@ -15,13 +15,13 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')
                 ->constrained('users');
-            $table->string('invoice', 10)
+            $table->string('invoice', 14)
                 ->unique();
-            $table->decimal('total');
-            $table->decimal('discount')
+            $table->decimal('total', 10, 2);
+            $table->decimal('discount', 10, 2)
                 ->nullable();
-            $table->decimal('payment');
-            $table->decimal('change')
+            $table->decimal('payment', 10, 2);
+            $table->decimal('change', 10, 2)
                 ->nullable();
             $table->timestamps();
         });
