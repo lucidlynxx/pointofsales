@@ -20,7 +20,8 @@ class ListSales extends ListRecords
 
     public array $data_list = [
         'calc_columns' => [
-            'total'
+            'total',
+            'profit'
         ],
     ];
 

@@ -17,7 +17,8 @@ class Sale extends Model
         'total',
         'discount',
         'payment',
-        'change'
+        'change',
+        'profit'
     ];
 
     public function getRouteKeyName()

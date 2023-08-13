@@ -22,7 +22,7 @@ class SaleResource extends Resource
 {
     protected static ?string $model = Sale::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-switch-horizontal';
+    protected static ?string $navigationIcon = 'heroicon-o-cash';
 
     protected static ?string $navigationGroup = 'Transaction';
 
@@ -65,7 +65,8 @@ class SaleResource extends Resource
                                             })
                                             ->searchable()
                                             ->getSearchResultsUsing(
-                                                fn (string $search) => Product::where('name', 'like', "%{$search}%")
+                                                fn (string $search) => Product::where('stock', '>', 0)
+                                                    ->where('name', 'like', "%{$search}%")
                                                     ->orWhere('barcode', 'like', "%{$search}%")
                                                     ->limit(25)
                                                     ->pluck('name', 'id')
@@ -87,10 +88,16 @@ class SaleResource extends Resource
                                                 }
                                             })
                                             ->numeric()
+                                            ->minValue(1)
+                                            ->maxValue(function (Closure $get) {
+                                                $product = Product::find($get('product_id'));
+                                                return $product->stock;
+                                            })
                                             ->default(1)
                                             ->required()
                                             ->columnSpan(2),
                                         Forms\Components\TextInput::make('price')
+                                            ->prefix('Rp')
                                             ->disabled()
                                             ->required()
                                             ->columnSpan(3)
@@ -105,16 +112,18 @@ class SaleResource extends Resource
                         Forms\Components\Section::make('Payment')
                             ->schema([
                                 Forms\Components\TextInput::make('total')
+                                    ->prefix('Rp')
                                     ->reactive()
                                     ->disabled()
                                     ->required(),
                                 Forms\Components\TextInput::make('discount')
+                                    ->prefix('Rp')
                                     ->mask(
                                         fn (TextInput\Mask $mask) => $mask
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
-                                    ->debounce('800ms')
+                                    ->debounce('1000ms')
                                     ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
                                         $prices = $get('saleItems');
                                         $values = collect($prices)->pluck('price');
@@ -123,12 +132,13 @@ class SaleResource extends Resource
                                     })
                                     ->numeric(),
                                 Forms\Components\TextInput::make('payment')
+                                    ->prefix('Rp')
                                     ->mask(
                                         fn (TextInput\Mask $mask) => $mask
                                             ->numeric()
                                             ->thousandsSeparator(',')
                                     )
-                                    ->debounce('800ms')
+                                    ->debounce('1000ms')
                                     ->afterStateUpdated(function ($state, Closure $set, Closure $get) {
                                         $set('change', str_replace('-', '', strval($get('total') - $state)));
                                     })
@@ -136,6 +146,7 @@ class SaleResource extends Resource
                                     ->numeric()
                                     ->required(),
                                 Forms\Components\TextInput::make('change')
+                                    ->prefix('Rp')
                                     ->numeric()
                                     ->disabled(),
                             ])->columns(2)
@@ -151,9 +162,12 @@ class SaleResource extends Resource
                     ->date('d M Y - H:i:s')
                     ->sortable()
                     ->searchable(),
-                Tables\Columns\TextColumn::make('user.name'),
+                Tables\Columns\TextColumn::make('user.name')
+                    ->label('Cashier'),
                 Tables\Columns\TextColumn::make('invoice'),
                 Tables\Columns\TextColumn::make('total')
+                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                Tables\Columns\TextColumn::make('profit')
                     ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
                 Tables\Columns\TextColumn::make('discount')
                     ->formatStateUsing(function ($state) {
@@ -176,10 +190,26 @@ class SaleResource extends Resource
                     ->toggleable(isToggledHiddenByDefault: true),
             ])->defaultSort('updated_at', 'desc')
             ->filters([
-                //
+                Tables\Filters\Filter::make('created_at')
+                    ->form([
+                        Forms\Components\DatePicker::make('created_from'),
+                        Forms\Components\DatePicker::make('created_until')->default(now()),
+                    ])
+                    ->query(function (Builder $query, array $data): Builder {
+                        return $query
+                            ->when(
+                                $data['created_from'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '>=', $date),
+                            )
+                            ->when(
+                                $data['created_until'],
+                                fn (Builder $query, $date): Builder => $query->whereDate('created_at', '<=', $date),
+                            );
+                    })
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                // Tables\Actions\EditAction::make(),
+                Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
@@ -199,7 +229,8 @@ class SaleResource extends Resource
         return [
             'index' => Pages\ListSales::route('/'),
             'create' => Pages\CreateSale::route('/create'),
-            'edit' => Pages\EditSale::route('/{record}/edit'),
+            // 'edit' => Pages\EditSale::route('/{record}/edit'),
+            'view' => Pages\ViewSale::route('/{record}'),
         ];
     }
 }
