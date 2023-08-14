@@ -14,6 +14,10 @@ class ListSales extends ListRecords
     protected function getActions(): array
     {
         return [
+            Actions\Action::make('Pdf')
+                ->color('danger')
+                ->icon('heroicon-o-document-text')
+                ->url(route('pdf'), shouldOpenInNewTab: true),
             Actions\CreateAction::make(),
         ];
     }

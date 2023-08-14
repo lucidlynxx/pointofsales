@@ -17,12 +17,14 @@ use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\SaleResource\RelationManagers;
 use App\Models\Product;
 use Closure;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Blade;
 
 class SaleResource extends Resource
 {
     protected static ?string $model = Sale::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-cash';
+    protected static ?string $navigationIcon = 'heroicon-o-switch-horizontal';
 
     protected static ?string $navigationGroup = 'Transaction';
 
@@ -209,7 +211,18 @@ class SaleResource extends Resource
             ])
             ->actions([
                 // Tables\Actions\EditAction::make(),
-                Tables\Actions\ViewAction::make(),
+                Tables\Actions\Action::make('pdf')
+                    ->label('PDF')
+                    ->color('success')
+                    ->icon('heroicon-s-download')
+                    ->action(function (Sale $record) {
+                        return response()->streamDownload(function () use ($record) {
+                            echo Pdf::loadHtml(
+                                Blade::render('print.pdfItem', ['record' => $record])
+                            )->stream();
+                        }, $record->invoice . '.pdf');
+                    }),
+                // Tables\Actions\ViewAction::make(),
                 Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
