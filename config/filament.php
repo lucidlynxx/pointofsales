@@ -73,7 +73,7 @@ return [
     */
 
     // 'brand' => env('APP_NAME'),
-    'brand' => 'Point of Sale',
+    'brand' => 'Point of Sales',
 
     /*
     |--------------------------------------------------------------------------
