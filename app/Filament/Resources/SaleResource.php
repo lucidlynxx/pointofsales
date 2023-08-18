@@ -246,4 +246,11 @@ class SaleResource extends Resource
             'view' => Pages\ViewSale::route('/{record}'),
         ];
     }
+
+    public static function getWidgets(): array
+    {
+        return [
+            SaleResource\Widgets\SaleOverview::class,
+        ];
+    }
 }

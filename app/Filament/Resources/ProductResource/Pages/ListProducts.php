@@ -16,4 +16,11 @@ class ListProducts extends ListRecords
             Actions\CreateAction::make(),
         ];
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            ProductResource\Widgets\ProductOverview::class,
+        ];
+    }
 }

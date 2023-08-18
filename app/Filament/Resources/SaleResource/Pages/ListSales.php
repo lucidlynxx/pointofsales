@@ -44,4 +44,11 @@ class ListSales extends ListRecords
     {
         return view('table.footer', $this->data_list);
     }
+
+    protected function getHeaderWidgets(): array
+    {
+        return [
+            SaleResource\Widgets\SaleOverview::class,
+        ];
+    }
 }
