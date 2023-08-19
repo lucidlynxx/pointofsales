@@ -19,6 +19,7 @@ use App\Models\Product;
 use Closure;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Support\Facades\Gate;
 
 class SaleResource extends Resource
 {
@@ -165,7 +166,9 @@ class SaleResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('user.name')
-                    ->label('Cashier'),
+                    ->label('Cashier')
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('invoice'),
                 Tables\Columns\TextColumn::make('total')
                     ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
@@ -252,5 +255,13 @@ class SaleResource extends Resource
         return [
             SaleResource\Widgets\SaleOverview::class,
         ];
+    }
+
+    public static function getEloquentQuery(): Builder
+    {
+        if (Gate::allows('admin')) {
+            return parent::getEloquentQuery();
+        }
+        return parent::getEloquentQuery()->where('user_id', auth()->user()->id);
     }
 }

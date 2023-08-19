@@ -66,4 +66,9 @@ class RoleResource extends Resource
             'index' => Pages\ManageRoles::route('/'),
         ];
     }
+
+    public static function getEloquentQuery(): Builder
+    {
+        return parent::getEloquentQuery()->where('name', '!=', 'admin');
+    }
 }

@@ -7,6 +7,7 @@ use Filament\Pages\Actions;
 use pxlrbt\FilamentExcel\Actions\Pages\ExportAction;
 use pxlrbt\FilamentExcel\Exports\ExcelExport;
 use Filament\Resources\Pages\ListRecords;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\View\View;
 
 class ListSales extends ListRecords
@@ -24,11 +25,13 @@ class ListSales extends ListRecords
                 ])
                 ->label('Excel')
                 ->color('success')
-                ->icon('heroicon-o-document-text'),
+                ->icon('heroicon-o-document-text')
+                ->visible(Gate::allows('admin')),
             Actions\Action::make('Pdf')
                 ->color('danger')
                 ->icon('heroicon-o-document-text')
-                ->url(route('pdf'), shouldOpenInNewTab: true),
+                ->url(route('pdf'), shouldOpenInNewTab: true)
+                ->visible(Gate::allows('admin')),
             Actions\CreateAction::make(),
         ];
     }

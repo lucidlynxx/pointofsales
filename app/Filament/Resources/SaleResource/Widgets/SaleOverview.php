@@ -6,10 +6,16 @@ use App\Models\Sale;
 use Filament\Widgets\StatsOverviewWidget\Card;
 use Filament\Widgets\StatsOverviewWidget as BaseWidget;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Gate;
 
 class SaleOverview extends BaseWidget
 {
     protected int | string | array $columnSpan = 3;
+
+    public static function canView(): bool
+    {
+        return Gate::allows('admin');
+    }
 
     protected function getCards(): array
     {

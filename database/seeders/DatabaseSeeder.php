@@ -14,7 +14,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $adminRole = Role::create(['name' => 'admin']);
-        Role::create(['name' => 'kasir']);
+        $kasirRole = Role::create(['name' => 'kasir']);
 
         $adminUser = \App\Models\User::create([
             'name' => 'Admin',
@@ -23,10 +23,19 @@ class DatabaseSeeder extends Seeder
             'password' => bcrypt('password123')
         ]);
 
+        $kasirUser = \App\Models\User::create([
+            'name' => 'Kasir',
+            'username' => 'kasir',
+            'email' => 'kasir@email.com',
+            'password' => bcrypt('password123')
+        ]);
+
         $adminUser->assignRole($adminRole);
+        $kasirUser->assignRole($kasirRole);
 
         $this->call(UnitSeeder::class);
         $this->call(CategorySeeder::class);
         $this->call(ProductSeeder::class);
+        $this->call(PermissionSeeder::class);
     }
 }

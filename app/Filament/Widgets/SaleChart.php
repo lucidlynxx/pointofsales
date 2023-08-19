@@ -6,6 +6,7 @@ use App\Models\Sale;
 use Flowframe\Trend\Trend;
 use Flowframe\Trend\TrendValue;
 use Filament\Widgets\LineChartWidget;
+use Illuminate\Support\Facades\Gate;
 
 class SaleChart extends LineChartWidget
 {
@@ -16,6 +17,11 @@ class SaleChart extends LineChartWidget
     protected int | string | array $columnSpan = 'full';
 
     protected static ?string $maxHeight = '325px';
+
+    public static function canView(): bool
+    {
+        return Gate::allows('admin');
+    }
 
     protected static ?array $options = [
         'plugins' => [
@@ -63,11 +69,11 @@ class SaleChart extends LineChartWidget
                 [
                     'label' => 'Total Profit',
                     'data' => $totalProfit,
-                    'borderColor' => 'rgb(0,255,0)',
-                    'backgroundColor' => 'rgb(0,255,0)',
+                    'borderColor' => 'rgb(50, 205, 50)',
+                    'backgroundColor' => 'rgb(50, 205, 50)',
                     'fill' => [
                         'target' => 'origin',
-                        'above' => 'rgb(0,255,0, 0.3)',   // Area will be violet above the origin
+                        'above' => 'rgb(50, 205, 50, 0.1)',   // Area will be violet above the origin
                     ]
                 ],
                 [
@@ -77,7 +83,7 @@ class SaleChart extends LineChartWidget
                     'backgroundColor' => 'rgb(127, 0, 255)',
                     'fill' => [
                         'target' => 'origin',
-                        'above' => 'rgba(127, 0, 255, 0.3)',   // Area will be violet above the origin
+                        'above' => 'rgba(127, 0, 255, 0.1)',   // Area will be violet above the origin
                     ]
                 ],
             ],
