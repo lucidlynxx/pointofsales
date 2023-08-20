@@ -3,9 +3,10 @@
 namespace App\Filament\Resources\SaleResource\Pages;
 
 use App\Filament\Resources\SaleResource;
-use Filament\Pages\Actions;
 use Filament\Resources\Pages\CreateRecord;
 use Illuminate\Database\Eloquent\Model;
+use Filament\Notifications\Actions\Action;
+use Filament\Notifications\Notification;
 
 class CreateSale extends CreateRecord
 {
@@ -31,5 +32,20 @@ class CreateSale extends CreateRecord
     protected function getCreatedNotificationTitle(): ?string
     {
         return 'Sale created';
+    }
+
+    protected function afterCreate(): void
+    {
+        Notification::make()
+            ->warning()
+            ->title('Cetak struk pembayaran!')
+            ->body('Klik cetak untuk melanjutkan.')
+            ->persistent()
+            ->actions([
+                Action::make('Cetak')
+                    ->button()
+                    ->url(route('pdfItem'), shouldOpenInNewTab: true),
+            ])
+            ->send();
     }
 }

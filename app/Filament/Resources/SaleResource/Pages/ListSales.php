@@ -28,6 +28,7 @@ class ListSales extends ListRecords
                 ->icon('heroicon-o-document-text')
                 ->visible(Gate::allows('admin')),
             Actions\Action::make('Pdf')
+                ->label('PDF')
                 ->color('danger')
                 ->icon('heroicon-o-document-text')
                 ->url(route('pdf'), shouldOpenInNewTab: true)

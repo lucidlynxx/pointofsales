@@ -15,7 +15,7 @@ class ProfitOverview extends BaseWidget
     protected function getCards(): array
     {
         return [
-            Card::make('Profit', 'Rp ' . number_format(Sale::whereDate('created_at', now())->pluck('profit')->sum()))
+            Card::make('Profit', 'Rp' . number_format(Sale::whereDate('created_at', now())->pluck('profit')->sum(), 0, ',', '.'))
                 ->description('Total profit yang didapat hari ini')
                 ->descriptionIcon('heroicon-s-cash')
                 ->color('success'),

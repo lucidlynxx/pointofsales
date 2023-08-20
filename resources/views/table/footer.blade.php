@@ -10,7 +10,7 @@
                 <div class="flex justify-start w-full px-4 py-2 filament-tables-text-column text-start">
                     <div class="inline-flex items-center space-x-1 rtl:space-x-reverse">
                         <span class="font-medium text-violet-700">
-                            {{ "Rp " . number_format($records->sum($calc_columns[$i]), 0, '.', ',') }}
+                            {{ "Rp" . number_format($records->sum($calc_columns[$i]), 0, ',', '.') }}
                         </span>
                     </div>
                 </div>

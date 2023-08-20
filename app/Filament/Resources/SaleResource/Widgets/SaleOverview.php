@@ -19,21 +19,20 @@ class SaleOverview extends BaseWidget
 
     protected function getCards(): array
     {
-        $startDate = Carbon::today()->subDays(7);
-        $sale = Sale::whereDate('created_at', '>=', $startDate)->get();
+        $sale = Sale::all();
         return [
-            Card::make('Profit', 'Rp ' . number_format($sale->pluck('profit')->sum(), 0, '.', ','))
-                ->description('Total profit yang didapat 7 hari terakhir')
+            Card::make('Profit', 'Rp' . number_format($sale->pluck('profit')->sum(), 0, ',', '.'))
+                ->description('Total profit yang didapat')
                 ->descriptionIcon('heroicon-s-cash')
                 ->chart($sale->pluck('profit')->toArray())
                 ->color('success'),
-            Card::make('Total', 'Rp ' . number_format($sale->pluck('total')->sum(), 0, '.', ','))
-                ->description('Total transaksi yang didapat 7 hari terakhir')
+            Card::make('Total', 'Rp' . number_format($sale->pluck('total')->sum(), 0, ',', '.'))
+                ->description('Total transaksi yang didapat')
                 ->descriptionIcon('heroicon-s-information-circle')
                 ->chart($sale->pluck('total')->toArray())
                 ->color('primary'),
             Card::make('Transaksi', $sale->count())
-                ->description('Total transaksi yang dilakukan 7 hari terakhir')
+                ->description('Total transaksi yang dilakukan')
                 ->descriptionIcon('heroicon-s-switch-horizontal')
                 ->color('secondary'),
         ];

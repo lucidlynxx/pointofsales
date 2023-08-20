@@ -109,7 +109,7 @@
                 <tr>
                     <td>{{ $item->product->name }}</td>
                     <td>{{ $item->quantity }}</td>
-                    <td class="right">{{ 'Rp ' . number_format($item->price, 0, '.', ',') }}</td>
+                    <td class="right">{{ 'Rp' . number_format($item->price, 0, ',', '.') }}</td>
                 </tr>
                 @endforeach
             </tbody>
@@ -117,11 +117,11 @@
 
         <div class="divider"></div>
         <div class="right">
-            <div class="padding">Total: {{ 'Rp ' . number_format($record->total, 0, '.', ',') }}</div>
-            <div class="padding">Discount: {{ 'Rp ' . number_format($record->discount, 0, '.', ',') }}</div>
+            <div class="padding">Total: {{ 'Rp' . number_format($record->total, 0, ',', '.') }}</div>
+            <div class="padding">Discount: {{ 'Rp' . number_format($record->discount, 0, ',', '.') }}</div>
             <div class="divider"></div>
-            <div class="padding">Payment: {{ 'Rp ' . number_format($record->payment, 0, '.', ',') }}</div>
-            <div class="padding">Change: {{ 'Rp ' . number_format($record->change, 0, '.', ',') }}</div>
+            <div class="padding">Payment: {{ 'Rp' . number_format($record->payment, 0, ',', '.') }}</div>
+            <div class="padding">Change: {{ 'Rp' . number_format($record->change, 0, ',', '.') }}</div>
         </div>
         <div class="divider"></div>
 

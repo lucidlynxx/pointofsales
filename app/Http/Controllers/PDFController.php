@@ -14,4 +14,12 @@ class PDFController extends Controller
         $pdf = Pdf::loadview('print.pdf', ['sales' => $sales]);
         return $pdf->stream();
     }
+
+    function printPdfItem()
+    {
+        $sale = Sale::latest()->first();
+
+        $pdf = pdf::loadView('print.pdfItem', ['record' => $sale]);
+        return $pdf->stream();
+    }
 }

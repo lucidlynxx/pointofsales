@@ -171,22 +171,22 @@ class SaleResource extends Resource
                     ->searchable(),
                 Tables\Columns\TextColumn::make('invoice'),
                 Tables\Columns\TextColumn::make('total')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.')),
                 Tables\Columns\TextColumn::make('profit')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.')),
                 Tables\Columns\TextColumn::make('discount')
                     ->formatStateUsing(function ($state) {
                         if ($state === null) {
-                            return "Rp 0";
+                            return "Rp0";
                         }
-                        return "Rp " . number_format($state, 0, '.', ',');
+                        return "Rp" . number_format($state, 0, ',', '.');
                     })
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('payment')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ','))
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('change')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ','))
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.'))
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->date('d M Y - H:i')
@@ -215,9 +215,9 @@ class SaleResource extends Resource
             ->actions([
                 // Tables\Actions\EditAction::make(),
                 Tables\Actions\Action::make('pdf')
-                    ->label('PDF')
-                    ->color('success')
-                    ->icon('heroicon-s-download')
+                    ->label('Struk')
+                    ->color('warning')
+                    ->icon('heroicon-s-printer')
                     ->action(function (Sale $record) {
                         return response()->streamDownload(function () use ($record) {
                             echo Pdf::loadHtml(

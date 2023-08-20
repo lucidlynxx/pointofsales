@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use Carbon\Carbon;
 use Filament\Facades\Filament;
 use Illuminate\Support\ServiceProvider;
 
@@ -20,6 +21,10 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        config(['app.locale' => 'en']);
+        Carbon::setLocale('id');
+        date_default_timezone_set('Asia/Jakarta');
+
         Filament::serving(function () {
             Filament::registerViteTheme('resources/css/filament.css');
             Filament::registerNavigationGroups([

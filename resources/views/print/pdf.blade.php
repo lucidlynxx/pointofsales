@@ -76,8 +76,8 @@
                 <td>{{ date_format($sale->created_at, 'd M Y, H:i:s') }}</td>
                 <td>{{ $sale->user->name }}</td>
                 <td>{{ $sale->invoice }}</td>
-                <td>{{ 'Rp '. number_format($sale->total, 0, '.', ',') }}</td>
-                <td>{{ 'Rp ' . number_format($sale->profit, 0, '.', ',') }}</td>
+                <td>{{ 'Rp'. number_format($sale->total, 0, ',', '.') }}</td>
+                <td>{{ 'Rp' . number_format($sale->profit, 0, ',', '.') }}</td>
             </tr>
             @php
             $totalSales += $sale->total; // Menambahkan total penjualan
@@ -88,15 +88,12 @@
         <tfoot>
             <tr>
                 <th colspan="4" style="text-align: right;">Total Keseluruhan:</th>
-                <th>{{ 'Rp '. number_format($totalSales, 0, '.', ',') }}</th>
-                <th>{{ 'Rp '. number_format($totalProfit, 0, '.', ',') }}</th>
+                <th>{{ 'Rp'. number_format($totalSales, 0, ',', '.') }}</th>
+                <th>{{ 'Rp'. number_format($totalProfit, 0, ',', '.') }}</th>
             </tr>
         </tfoot>
     </table>
 
-    <center>
-        ----------------------------------------------------------------------------------------------------------------------------
-    </center>
 </body>
 
 </html>

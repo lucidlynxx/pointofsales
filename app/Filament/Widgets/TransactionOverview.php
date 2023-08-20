@@ -15,7 +15,7 @@ class TransactionOverview extends BaseWidget
     protected function getCards(): array
     {
         return [
-            Card::make('Profit', 'Rp ' . number_format(Sale::whereDate('created_at', now())->pluck('total')->sum()))
+            Card::make('Profit', 'Rp' . number_format(Sale::whereDate('created_at', now())->pluck('total')->sum(), 0, ',', '.'))
                 ->description('Total transaksi yang didapat hari ini')
                 ->descriptionIcon('heroicon-s-information-circle')
                 ->color('primary'),

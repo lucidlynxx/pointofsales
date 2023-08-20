@@ -19,3 +19,4 @@ Route::get('/', function () {
 });
 
 Route::get('/sales-report', [PDFController::class, 'printPdf'])->name('pdf');
+Route::get('/invoice', [PDFController::class, 'printPdfItem'])->name('pdfItem');

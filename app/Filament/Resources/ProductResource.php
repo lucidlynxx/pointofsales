@@ -138,9 +138,9 @@ class ProductResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('buy_price')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.')),
                 Tables\Columns\TextColumn::make('sell_price')
-                    ->formatStateUsing(fn (string $state): string => "Rp " . number_format($state, 0, '.', ',')),
+                    ->formatStateUsing(fn (string $state): string => "Rp" . number_format($state, 0, ',', '.')),
                 Tables\Columns\TextColumn::make('stock')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('unit.name')
