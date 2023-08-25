@@ -17,6 +17,8 @@ class SaleItem extends Model
         'price'
     ];
 
+    protected $with = ['product'];
+
     public function sale(): BelongsTo
     {
         return $this->belongsTo(Sale::class);
